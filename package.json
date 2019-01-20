@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "mocha -R spec --require @babel/polyfill --require @babel/register \"src/**/*spec.js\"",
-    "build": "babel src -d dist",
+    "build": "babel src -d dist --source-maps",
     "start": "node $NODE_DEBUG_OPTION dist/index.js"
   },
   "author": "Antonio Martinović",
@@ -22,6 +22,7 @@
     "@babel/polyfill": "^7.2.5",
     "child-process-promise": "^2.2.1",
     "cors": "2.8.5",
+    "diff": "^4.0.1",
     "dotenv": "6.2.0",
     "express": "4.16.4",
     "lodash": "4.17.11",

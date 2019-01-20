@@ -1,26 +1,27 @@
 import "@babel/polyfill";
-import cors from "cors";
-import express from "express";
-import path from "path";
+import _ from 'lodash';
+import './common';
 import config from './config';
-import {initDatabase} from "./db";
+import loadDatabase, {initDatabase} from "./db";
+import { initComparator } from './comparator/comparator';
+import { initWebApp}  from './web'
 
-import rootRouter from "./rootRouter";
 
-const app = express();
-initDatabase();
+Promise.all([loadDatabase(config.dbPath).then(initDatabase), loadDatabase(config.readDbPath)])
+    .then((dbs) => {
+        const comparatorConfig = _.extend(config, {
+            headerIgnores: ["Content-Length", "ETag", "Date"],
+            authorization: ["JWT"],
+            bodyIgnores: [
+                "id"
+            ]
+        });
 
-const corsOptions = {
-    methods: "GET,HEAD,POST,DELETE",
-    optionsSuccessStatus: 204,
-    origin: "*",
-    preflightContinue: false,
-};
+        initComparator(dbs[0], dbs[1], comparatorConfig);
+    })
+    .catch((err) => {
+        console.error(err);
+        process.exit(1)
+    });
 
-app.use(cors(corsOptions));
-app.use(express.static(path.join(__dirname, "/public")));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use("/", rootRouter);
-
-app.listen(config.port, () => console.log(`Listening on port ${config.port}`));
+initWebApp(config);
