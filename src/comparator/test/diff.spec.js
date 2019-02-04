@@ -54,3 +54,38 @@ describe("HTTP headers comparator", function() {
         removed(changes.diff).should.equal("");
     });
 });
+
+
+describe("HTTP body comparator", function() {
+    it("returns no changes with identical body and no config", function() {
+        const rawBody = testData.bodyJsonSimple;
+
+        const changes = body(JSON.parse(rawBody), JSON.parse(rawBody), {});
+
+        added(changes.diff).should.equal("");
+        removed(changes.diff).should.equal("");
+    });
+
+    it("returns no changes with different, but ignored 'id' property in body", function() {
+        const rawBody = testData.bodyJsonSimple;
+
+        const changes = body(JSON.parse(rawBody), JSON.parse(rawBody), {
+            ignores: [`"id"`]
+        });
+
+        added(changes.diff).should.equal("");
+        removed(changes.diff).should.equal("");
+    });
+
+    it("", function() {
+        const changes = body(
+            JSON.parse(testData.bodyJsonSimple),
+            JSON.parse(testData.bodyJsonSimpleExtraField),
+            {});
+
+        added(changes.diff).should.equal(`  "extra": "stuff",\n`);
+        removed(changes.diff).should.equal("");
+    });
+
+
+});
