@@ -5,8 +5,8 @@ import * as diff from './diff';
 function processLatest(writeDb, readDb, config) {
     getLatest(writeDb, readDb).then(latestRequests => {
         latestRequests.forEach((req) => {
-            const diffHead = diff.headers(req.responseHeaders, req.replayHeaders, config);
-            const diffBody = diff.body(req.responseBody, req.replayBody, config);
+            const diffHead = diff.headers(req.responseHeaders, req.replayHeaders, config.header);
+            const diffBody = diff.body(JSON.parse(req.responseBody), JSON.parse(req.replayBody), config.body);
 
             writeParsedRequest(writeDb, [
                 req.id,

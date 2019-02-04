@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS parsed_responses (
     headerReplayIgnored TEXT,
     bodyDiff TEXT,
     bodyResponseIgnored TEXT,
-    bodyReplayIgnored TEXT,
+    bodyReplayIgnored TEXT
 );
 `;
 

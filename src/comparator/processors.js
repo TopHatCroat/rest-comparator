@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as JsDiff from "diff";
 
-export function authorization(original, replayed) {
+export function authorization(original, replayed, config) {
     if (_.isEmpty(original) || _.isEmpty(replayed)) {
         return JsDiff.diffLines(original, replayed);
     }
@@ -14,8 +14,8 @@ export function authorization(original, replayed) {
         const replTokenParts = repl[2].split(".");
         const origPayload = JSON.parse(fromB64(origTokenParts[1]));
         const replPayload = JSON.parse(fromB64(replTokenParts[1]));
-        const origPayloadFiltered = _.omit(origPayload, ['jti', 'iat', 'exp']);
-        const replPayloadFiltered = _.omit(replPayload, ['jti', 'iat', 'exp']);
+        const origPayloadFiltered = _.omit(origPayload, config.ignores);
+        const replPayloadFiltered = _.omit(replPayload, config.ignores);
 
         const diff = JsDiff.diffJson(origPayloadFiltered, replPayloadFiltered);
         const equal = diff.length === 1;

@@ -10,11 +10,17 @@ import { initWebApp}  from './web'
 Promise.all([loadDatabase(config.dbPath).then(initDatabase), loadDatabase(config.readDbPath)])
     .then((dbs) => {
         const comparatorConfig = _.extend(config, {
-            headerIgnores: ["Content-Length", "ETag", "Date"],
-            authorization: ["JWT"],
-            bodyIgnores: [
-                "id"
-            ]
+            header: {
+                ignores: ["Content-Length", "ETag", "Date"],
+                parsers: [{
+                    matcher: "authorization",
+                    type: "jwt",
+                    ignores: ["jti", "exp"]
+                }]
+            },
+            body: {
+                ignores: ["id"]
+            }
         });
 
         initComparator(dbs[0], dbs[1], comparatorConfig);
