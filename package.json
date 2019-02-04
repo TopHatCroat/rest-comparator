@@ -4,7 +4,7 @@
   "description": "Compare responses for changes",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha -R spec --require @babel/polyfill --require @babel/register \"src/**/*spec.js\"",
+    "test": "mocha -R spec --require @babel/polyfill --require @babel/register src/**/*spec.js",
     "build": "babel src -d dist --source-maps",
     "start": "node $NODE_DEBUG_OPTION dist/index.js"
   },
