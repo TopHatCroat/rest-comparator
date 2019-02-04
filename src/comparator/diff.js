@@ -4,24 +4,23 @@ import * as JsDiff from "diff";
 import * as processors from "./processors";
 
 export function body(original, replay, config) {
-    const origIgnored = _.pick(original, config.ignores);
-    const replIgnored = _.pick(replay, config.ignores);
-    const orig = _.omit(original, config.ignores);
-    const repl = _.omit(replay, config.ignores);
-
+    const extra = {};
     const comparator = (left, right) => {
-        console.log(left, right);
+        const leftFiltered = _.findIndex(config.ignores, i => { return left.match(i) !== null }) !== -1;
+        const rightFiltered = _.findIndex(config.ignores, i => { return right.match(i) !== null }) !== -1;
+
+        if(leftFiltered && rightFiltered) {
+            return true;
+        }
+
         return left === right;
     };
 
-    const diff = JsDiff.diffJson(orig, repl, { comparator });
+    const diff = JsDiff.diffJson(original, replay, { comparator });
 
     return {
         diff,
-        origIgnored,
-        replIgnored,
-        actualOrig: original,
-        actualRepl: replay
+        extra,
     };
 }
 
