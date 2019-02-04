@@ -4,12 +4,17 @@ import * as JsDiff from "diff";
 import * as processors from "./processors";
 
 export function body(original, replay, config) {
-    const origIgnored = _.pick(JSON.parse(original), config.bodyIgnores);
-    const replIgnored = _.pick(JSON.parse(replay), config.bodyIgnores);
-    const orig = _.omit(JSON.parse(original), config.bodyIgnores);
-    const repl = _.omit(JSON.parse(replay), config.bodyIgnores);
+    const origIgnored = _.pick(original, config.ignores);
+    const replIgnored = _.pick(replay, config.ignores);
+    const orig = _.omit(original, config.ignores);
+    const repl = _.omit(replay, config.ignores);
 
-    const diff = JsDiff.diffJson(orig, repl);
+    const comparator = (left, right) => {
+        console.log(left, right);
+        return left === right;
+    };
+
+    const diff = JsDiff.diffJson(orig, repl, { comparator });
 
     return {
         diff,
@@ -21,58 +26,39 @@ export function body(original, replay, config) {
 }
 
 export function headers(original, replay, config) {
-    const orig = original.split('\r\n');
-    const repl = replay.split('\r\n');
-    const origIgnored = [];
-    const replIgnored = [];
-    const actualOrig = [];
-    const actualRepl = [];
-    const authHead = {
-        original: "",
-        replayed: ""
+
+    const extra = {};
+    const comparator = (left, right) => {
+        const l = _.clone(left).toLowerCase();
+        const r = _.clone(right).toLowerCase();
+
+        const leftFiltered = _.findIndex(config.ignores, i => { return l.startsWith(i.toLowerCase())}) !== -1;
+        const rightFiltered = _.findIndex(config.ignores, i => { return r.startsWith(i.toLowerCase())}) !== -1;
+        if (leftFiltered || rightFiltered) {
+            return true;
+        }
+
+        const parsers = _.get(config, 'parsers', []);
+        for (let i = 0; i < parsers.length; i++) {
+            const parser = parsers[i];
+
+            if (l.matches(parser.matcher) !== null && r.matcher(parser.matcher)) {
+                switch (parser.type) {
+                    case "jwt":
+                        const result = processors.authorization(left, right, parser);
+                        extra.push({ [parser.matcher]: result });
+                        return result.length === 1; // longer array means something was added and removed
+                }
+            }
+        }
+
+        return left === right;
     };
 
-    orig.forEach(h => {
-        const header = h.toLowerCase();
-
-        if (header.startsWith("authorization")) {
-            authHead.original = h;
-            return;
-        }
-
-        const filtered = _.findIndex(
-            config.headerIgnores, i => {
-                return header.startsWith(i.toLowerCase())
-            }) !== -1;
-
-        filtered ? origIgnored.push(h) : actualOrig.push(h);
-    });
-
-    repl.forEach(h => {
-        const header = h.toLowerCase();
-
-        if (header.startsWith("authorization")) {
-            authHead.replayed = h;
-            return;
-        }
-
-        const filtered = _.findIndex(
-            config.headerIgnores, i => {
-                return header.startsWith(i.toLowerCase())
-            }) !== -1;
-
-        filtered ? replIgnored.push(h) : actualRepl.push(h);
-    });
-
-    const diff = JsDiff.diffLines(actualOrig.join('\r\n'), actualRepl.join('\r\n'));
-    const authDiff = processors.authorization(authHead.original, authHead.replayed);
-    authDiff.forEach(e => diff.push(e));
+    const diff = JsDiff.diffLines(original, replay, { comparator });
 
     return {
-        diff: diff,
-        origIgnored: origIgnored.join('\r\n'),
-        replIgnored: replIgnored.join('\r\n'),
-        actualOrig: actualOrig.join('\r\n'),
-        actualRepl: actualRepl.join('\r\n'),
+        diff,
+        extra,
     };
 }
