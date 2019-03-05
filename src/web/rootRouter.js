@@ -1,6 +1,10 @@
 import _ from 'lodash';
 import express from "express";
 import cp from 'child-process-promise';
+import {
+    UserError,
+    asyncMiddleware
+} from './utils';
 
 const router = express.Router();
 
@@ -24,16 +28,16 @@ const jobs = [];
  *       '201':
  *          description: Created
  */
-router.post("/jobs", async (req, res) => {
+router.post("/jobs", asyncMiddleware(async (req, res) => {
     const inputPort = req.body.inputPort;
     const replayPort = req.body.replayPort;
 
     if(!_.isNumber(inputPort)) {
-        throw new Error('inputPort must be a valid number');
+        throw new UserError(400,'inputPort must be a valid number');
     }
 
     if(!_.isNumber(replayPort)) {
-        throw new Error('replayPort must be a valid number');
+        throw new UserError(400, 'replayPort must be a valid number');
     }
 
     const proc = await cp.spawn(`sudo gor --input-raw :${inputPort} \
@@ -53,7 +57,7 @@ router.post("/jobs", async (req, res) => {
 
     res.status(201);
     res.json(job);
-});
+}));
 
 /**
  * @swagger
@@ -85,10 +89,8 @@ router.delete("/jobs", async (req, res) => {
  *       '200':
  *          description: Success
  */
-router.get("/status", async (req, res) => {
-    res.json({
-        jobs,
-    });
+router.get("/jobs", async (req, res) => {
+    res.json(jobs);
 });
 
 export default router;

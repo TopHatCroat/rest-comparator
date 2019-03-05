@@ -18,7 +18,18 @@ export function initWebApp(config) {
     app.use(express.static(path.join(__dirname, "/public")));
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+
     app.use("/", rootRouter);
+
+    app.use((err, req, res, next) => {
+        if (res.headersSent) {
+            return next(err)
+        }
+        res.status(err.status);
+        res.json({
+            message: err.message
+        })
+    });
 
     app.listen(config.port, () => console.log(`Listening on port ${config.port}`));
 }

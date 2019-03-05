@@ -25,8 +25,7 @@ export function body(original, replay, config) {
 }
 
 export function headers(original, replay, config) {
-
-    const extra = {};
+    const extra = [];
     const comparator = (left, right) => {
         const l = _.clone(left).toLowerCase();
         const r = _.clone(right).toLowerCase();
@@ -41,7 +40,7 @@ export function headers(original, replay, config) {
         for (let i = 0; i < parsers.length; i++) {
             const parser = parsers[i];
 
-            if (l.matches(parser.matcher) !== null && r.matcher(parser.matcher)) {
+            if (l.match(parser.matcher) !== null && r.match(parser.matcher)) {
                 switch (parser.type) {
                     case "jwt":
                         const result = processors.authorization(left, right, parser);
