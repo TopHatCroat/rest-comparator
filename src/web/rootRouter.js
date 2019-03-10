@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import express from "express";
 import cp from 'child-process-promise';
+import config from '../config'
 import {
     UserError,
     asyncMiddleware
@@ -40,7 +41,7 @@ router.post("/jobs", asyncMiddleware(async (req, res) => {
         throw new UserError(400, 'replayPort must be a valid number');
     }
 
-    const proc = await cp.spawn(`sudo gor --input-raw :${inputPort} \
+    const proc = await cp.exec(`sudo gor --input-raw :${inputPort} \
                                     --input-raw-track-response \
                                     --output-http-track-response \
                                     --middleware "./dist/index.js ${config.dbPath} \
@@ -70,13 +71,13 @@ router.post("/jobs", asyncMiddleware(async (req, res) => {
  *       '200':
  *          description: Success
  */
-router.delete("/jobs", async (req, res) => {
+router.delete("/jobs", asyncMiddleware(async (req, res) => {
     const killList = jobs.map(job => {
        cp.exec(`kill -9 ${job.pid}`);
     });
 
     return await Promise.all(killList)
-});
+}));
 
 /**
  * @swagger

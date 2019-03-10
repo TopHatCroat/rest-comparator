@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import express from "express";
 import path from 'path';
 import cors from "cors";
@@ -25,7 +26,9 @@ export function initWebApp(config) {
         if (res.headersSent) {
             return next(err)
         }
-        res.status(err.status);
+
+        const status = _.get(err, 'status', 500);
+        res.status(status);
         res.json({
             message: err.message
         })

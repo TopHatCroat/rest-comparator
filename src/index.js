@@ -1,4 +1,3 @@
-import "@babel/polyfill";
 import _ from 'lodash';
 import './common';
 import config from './config';
