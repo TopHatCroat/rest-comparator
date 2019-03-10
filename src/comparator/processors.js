@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as JsDiff from "diff";
+import {toB64, fromB64} from "../common";
 
 export function authorization(original, replayed, config) {
     if (_.isEmpty(original) || _.isEmpty(replayed)) {
