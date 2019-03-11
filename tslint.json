@@ -5,7 +5,11 @@
   ],
   "jsRules": {},
   "rules": {
-    "no-console": false
+    "no-console": false,
+    "object-literal-sort-keys": {
+      "options": "match-declaration-order"
+    },
+    "ordered-imports": false
   },
   "rulesDirectory": []
 }
