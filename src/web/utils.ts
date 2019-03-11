@@ -1,4 +1,4 @@
-import {NextFunction, Request, RequestHandler, Response} from "express-serve-static-core";
+import {NextFunction, Request, RequestHandler, Response} from "express";
 
 const asyncMiddleware = (fn: RequestHandler) => (req: Request, res: Response, next: NextFunction) => {
     return Promise
@@ -6,16 +6,6 @@ const asyncMiddleware = (fn: RequestHandler) => (req: Request, res: Response, ne
         .catch(next);
 };
 
-class UserError extends Error {
-    public readonly status: number;
-
-    constructor(status: number, message: string) {
-        super(message);
-        this.status = status;
-    }
-}
-
 export {
-    UserError,
     asyncMiddleware,
 };

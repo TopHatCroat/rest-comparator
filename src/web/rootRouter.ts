@@ -1,15 +1,9 @@
 import _ from "lodash";
-import express from "express";
+import express, {Request, Response} from "express";
 import {spawn, exec} from "child_process";
-import {Request, Response, NextFunction} from "express-serve-static-core";
 import config from "../config";
-import {
-asyncMiddleware,
-UserError,
-} from "./utils";
-const fs = require("fs");
-const out = fs.openSync("./out.log", "a");
-const err = fs.openSync("./out.log", "a");
+import {asyncMiddleware} from "./utils";
+import {UserError} from "./errors";
 
 const router = express.Router();
 
@@ -51,10 +45,16 @@ router.post("/jobs", asyncMiddleware(async (req: Request, res: Response) => {
         throw new UserError(400, "replayPort must be a valid number");
     }
 
-    const args: string[] = [`${config.gorExecutable}`, "--input-raw", `:${inputPort}`, "--input-raw-track-response",
-        "--output-http-track-response", "--output-http", `http://localhost:${replayPort}`];
-    const cp = spawn("sudo", args, {detached: true, stdio: [ "ignore", out, err ]});
+    const args: string[] = [
+        `${config.gorExecutable}`,
+        "--input-raw", `:${inputPort}`,
+        "--input-raw-track-response",
+        "--output-http-track-response",
+        "--output-http", `http://localhost:${replayPort}`];
+
+    const cp = spawn("sudo", args, {detached: true, stdio: [ "ignore" ]});
     cp.unref();
+
     const job: Job = {
         inputPort,
         replayPort,
@@ -75,7 +75,7 @@ router.post("/jobs", asyncMiddleware(async (req: Request, res: Response) => {
  *     - Job
  *     summary: Stops all jobs
  *     responses:
- *       '200':
+ *       '202':
  *          description: Success
  */
 router.delete("/jobs", (req: Request, res: Response) => {
@@ -97,7 +97,7 @@ router.delete("/jobs", (req: Request, res: Response) => {
  *          description: Success
  */
 router.get("/jobs", (req: Request, res: Response) => {
-    res.json(jobs);
+    res.status(200).json(jobs);
 });
 
 export default router;

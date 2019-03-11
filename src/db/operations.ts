@@ -1,17 +1,17 @@
 import {sleep} from "../common";
-import {SQLite} from "./database";
+import {PromisedDatabase} from "./database";
 
 export const CREATE_STATEMENT = `
-CREATE TABLE IF NOT EXISTS parsed_responses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    request_id INTEGER,
-    headerDiff TEXT,
-    headerResponseIgnored TEXT,
-    headerReplayIgnored TEXT,
-    bodyDiff TEXT,
-    bodyResponseIgnored TEXT,
-    bodyReplayIgnored TEXT
-);
+    CREATE TABLE IF NOT EXISTS parsed_responses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER,
+        headerDiff TEXT,
+        headerResponseIgnored TEXT,
+        headerReplayIgnored TEXT,
+        bodyDiff TEXT,
+        bodyResponseIgnored TEXT,
+        bodyReplayIgnored TEXT
+    );
 `;
 
 export const INSERT_STATEMENT = `
@@ -23,10 +23,16 @@ export const INSERT_STATEMENT = `
 
 export const SELECT_LAST_PARSED_ID_STATEMENT = "SELECT MAX(request_id) AS lastId FROM parsed_responses";
 
-export async function* newRequests(readDb: SQLite, fromId = 0) {
+export async function saveProcessed(writeDb: PromisedDatabase, data: any) {
+    return await writeDb.run(INSERT_STATEMENT, data);
+}
+
+export async function* newRequests(readDb: PromisedDatabase, writeDb: PromisedDatabase) {
+    const lastIdRes = await writeDb.single(SELECT_LAST_PARSED_ID_STATEMENT);
+    let lastId = lastIdRes.lastId || 0;
+
     const SELECT_LATEST_STATEMENT = "SELECT * FROM responses WHERE id > ?";
 
-    let lastId = fromId;
     while (readDb.isOpened()) {
         yield* (async function *() {
             await sleep(1000);

@@ -1,7 +1,7 @@
 import _ from "lodash";
 import sqlite, {Database} from "sqlite3";
 
-export class SQLite {
+export class PromisedDatabase {
     private db: Database;
     private opened: boolean;
 
@@ -64,19 +64,19 @@ export class SQLite {
     public isOpened = () => this.opened;
 }
 
-export default function loadDatabase(dbPath: string, initStatement?: string): Promise<SQLite> {
+export default function loadDatabase(dbPath: string, initStatement?: string): Promise<PromisedDatabase> {
     return new Promise(async (resolve, reject) => {
         const db = new sqlite.Database(dbPath, (err: Error) => {
             if (err) {
                 reject(err);
             }
 
-            const sqliteDb = new SQLite(db);
+            const promisedDatabase = new PromisedDatabase(db);
 
             if (initStatement) {
-                sqliteDb.execute(initStatement).then(() => resolve(sqliteDb));
+                promisedDatabase.execute(initStatement).then(() => resolve(promisedDatabase));
             } else {
-                resolve(sqliteDb);
+                resolve(promisedDatabase);
             }
         });
     });
