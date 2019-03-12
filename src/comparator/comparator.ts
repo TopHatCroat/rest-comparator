@@ -1,4 +1,4 @@
-import {PromisedDatabase, saveProcessed, newRequests} from "../db";
+import { PromisedDatabase, saveProcessed, newRequests } from "../db";
 import * as diff from "./diff";
 
 function processRequest(req: any, config: any): string[] {

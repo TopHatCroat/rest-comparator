@@ -1,4 +1,4 @@
-import loadDatabase, {PromisedDatabase} from "./database";
+import loadDatabase, { PromisedDatabase } from "./database";
 
 import {
     newRequests,

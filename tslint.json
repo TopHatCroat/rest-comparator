@@ -3,13 +3,27 @@
   "extends": [
     "tslint:recommended"
   ],
-  "jsRules": {},
+  "jsRules": {
+    "object-literal-sort-keys": false
+  },
   "rules": {
     "no-console": false,
-    "object-literal-sort-keys": {
-      "options": "match-declaration-order"
-    },
-    "ordered-imports": false
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-rest-spread",
+      "check-type",
+      "check-typecast",
+      "check-type-operator",
+      "check-preblock",
+      "check-postbrace"
+    ]
   },
   "rulesDirectory": []
 }

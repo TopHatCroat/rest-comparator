@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha -R spec --require @babel/polyfill --require @babel/register src/**/*spec.js",
     "build": "tsc",
+    "lint": "tslint -p ./tslint.json --fix --project .",
     "start": "node $NODE_DEBUG_OPTION index.js"
   },
   "author": "Antonio Martinović",

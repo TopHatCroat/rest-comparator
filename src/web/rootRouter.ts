@@ -1,9 +1,9 @@
 import _ from "lodash";
-import express, {Request, Response} from "express";
-import {spawn, exec} from "child_process";
+import express, { Request, Response } from "express";
+import { spawn, exec } from "child_process";
 import config from "../config";
-import {asyncMiddleware} from "./utils";
-import {UserError} from "./errors";
+import { asyncMiddleware } from "./utils";
+import { UserError } from "./errors";
 
 const router = express.Router();
 
@@ -52,7 +52,7 @@ router.post("/jobs", asyncMiddleware(async (req: Request, res: Response) => {
         "--output-http-track-response",
         "--output-http", `http://localhost:${replayPort}`];
 
-    const cp = spawn("sudo", args, {detached: true, stdio: [ "ignore" ]});
+    const cp = spawn("sudo", args, { detached: true, stdio: [ "ignore" ]});
     cp.unref();
 
     const job: Job = {

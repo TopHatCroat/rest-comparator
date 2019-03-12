@@ -1,7 +1,7 @@
 import _ from "lodash";
 import cors from "cors";
 import express from "express";
-import {NextFunction, Request, Response} from "express-serve-static-core";
+import { NextFunction, Request, Response } from "express-serve-static-core";
 import path from "path";
 import rootRouter from "./rootRouter";
 

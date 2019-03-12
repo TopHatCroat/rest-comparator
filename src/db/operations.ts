@@ -1,5 +1,5 @@
-import {sleep} from "../common";
-import {PromisedDatabase} from "./database";
+import { sleep } from "../common";
+import { PromisedDatabase } from "./database";
 
 export const CREATE_STATEMENT = `
     CREATE TABLE IF NOT EXISTS parsed_responses (

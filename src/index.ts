@@ -1,9 +1,9 @@
 import _ from "lodash";
 import "./common";
-import {initComparator} from "./comparator";
+import { initComparator } from "./comparator";
 import config from "./config";
-import loadDatabase, {CREATE_STATEMENT} from "./db";
-import {initWebApp} from "./web";
+import loadDatabase, { CREATE_STATEMENT } from "./db";
+import { initWebApp } from "./web";
 
 Promise.all([loadDatabase(config.dbPath!, CREATE_STATEMENT), loadDatabase(config.readDbPath!)])
     .then((dbs) => {

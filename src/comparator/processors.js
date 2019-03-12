@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from "lodash";
 import * as JsDiff from "diff";
 import {toB64, fromB64} from "../common";
 
@@ -21,51 +21,51 @@ export function authorization(original, replayed, config) {
         const diff = JsDiff.diffJson(origPayloadFiltered, replPayloadFiltered);
         const equal = diff.length === 1;
         this.value = {
+            equal,
             original,
             replayed,
-            equal,
             processed: {
                 original: origPayloadFiltered,
                 replayed: replPayloadFiltered,
-            }
-        }
+            },
+        };
     } else {
         const procOrig = btoa(orig[2]);
         const procRepl = btoa(repl[2]);
         const equal = _.isEqual(procOrig, procRepl);
 
         this.value = {
+            equal,
             original,
             replayed,
-            equal,
             processed: {
                 original: procOrig,
-                replayed: procRepl
-            }
-        }
+                replayed: procRepl,
+            },
+        };
     }
 
     if (this.value.equal) {
         return [{
             count: 1,
-            value: this.value.original,
             processed: this.value.processed,
+            value: this.value.original,
         }];
     } else {
         return [{
             count: 1,
-            value: this.value.original,
-            removed: true,
             processed: {
                 original: this.value.processed.original,
-            }
+            },
+            removed: true,
+            value: this.value.original,
         }, {
-            count: 1,
-            value: this.value.replayed,
             added: true,
+            count: 1,
             processed: {
                 replayed: this.value.processed.replayed,
-            }
-        }]
+            },
+            value: this.value.replayed,
+        }];
     }
 }

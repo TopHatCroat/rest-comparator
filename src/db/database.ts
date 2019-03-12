@@ -1,5 +1,5 @@
 import _ from "lodash";
-import sqlite, {Database} from "sqlite3";
+import sqlite, { Database } from "sqlite3";
 
 export class PromisedDatabase {
     private db: Database;
